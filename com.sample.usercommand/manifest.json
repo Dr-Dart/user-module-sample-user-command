@@ -1,0 +1,61 @@
+{
+  "main": "index.bundle.js",
+  "usesPermissions": [],
+  "supportedLanguages": [],
+  "requiredPackageNames": [],
+  "type": "USER_COMMAND",
+  "screens": [
+    {
+      "name": "User Command Sample",
+      "id": "MainScreen",
+      "messageFilters": [
+        {
+          "action": "dart.message.action.MAIN",
+          "category": "dart.message.category.SCREEN"
+        }
+      ]
+    },
+    {
+      "name": "Connect & Move",
+      "id": "usercommand_id1",
+      "messageFilters": [
+        {
+          "action": "com.dart.module.taskeditor.action.USER_COMMAND",
+          "category": "dart.message.category.PIP_SCREEN"
+        }
+      ]
+    },
+    {
+      "name": "Convert Pose",
+      "id": "usercommand_id2",
+      "messageFilters": [
+        {
+          "action": "com.dart.module.taskeditor.action.USER_COMMAND",
+          "category": "dart.message.category.PIP_SCREEN"
+        }
+      ]
+    }
+  ],
+  "services": [
+    {
+      "name": "usercommand_id1 service",
+      "id": "usercommand_id1",
+      "messageFilters": [
+        {
+          "action": "com.dart.module.taskeditor.action.USER_COMMAND",
+          "category": "dart.message.category.SERVICE"
+        }
+      ]
+    },
+    {
+      "name": "usercommand_id2 service",
+      "id": "usercommand_id2",
+      "messageFilters": [
+        {
+          "action": "com.dart.module.taskeditor.action.USER_COMMAND",
+          "category": "dart.message.category.SERVICE"
+        }
+      ]
+    }
+  ]
+}

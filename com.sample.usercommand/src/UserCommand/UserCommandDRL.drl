@@ -1,0 +1,28 @@
+#
+#   BSD 3-Clause License
+#   Copyright (c) 2023, Doosan Robotics Inc.
+#
+# Add python def function with DRL foreach User Command
+# Define Global Variable for User Commands
+# Description: Add variable declaration code to the top of this DRL file in 'channel.receive("req_to_save_commands_def_as_sub_program..') in the UserCommandService.ts file.
+# e.g. Global_ip = "192.168.1.1"
+# e.g. Global_initPoseZyx = [0,0,0,0,0,0]
+# You can use Global_ip and Global_initPoseZyx in anywhere using 'global {variablea_name}' syntex in custom function.
+# User Command Sample1
+def usercommand_sample_function(waitTime, useOverridePose, initPoseZyx):
+    global Global_ip
+    global Global_initPoseZyx
+    tp_popup(message='Connected to ' + Global_ip)
+    wait(waitTime)
+    # you can use movel() with zyz Pose
+    # poseZyz = usercommand_sample_calcXyzToZyz(initPoseZyx)
+    if useOverridePose:
+        movel_coord(posx(initPoseZyx)) # movel(posx(poseZyz))
+    else:
+        movel_coord(posx(Global_initPoseZyx)) #movel(posx(usercommand_sample_calcXyzToZyz(Global_initPoseZyx)))
+
+def usercommand_sample_calcXyzToZyz(pos):
+    newRotation = rpy2eul([pos[3],pos[4],pos[5]])
+    newPos = [pos[0],pos[1],pos[2],newRotation[0],newRotation[1],newRotation[2]]
+    tp_popup(message='pose convert from(zyx) ' + str(pos) + ' to(zyz)'+ str(newPos))
+    return newPos

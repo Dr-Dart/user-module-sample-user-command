@@ -1,0 +1,9 @@
+{
+    "name": "sample-user-command",
+    "packageName": "com.sample.usercommand",
+    "version": "2.0.1",
+    "sdkVersion": "2",
+    "icon": "assets/images/icon.png",
+    "drscModulePackageFile": "drsc_com.sample.usercommand.dm",
+    "drcfModulePackageFile  ": ""
+}
