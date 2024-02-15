@@ -15,11 +15,10 @@ def usercommand_sample_function(waitTime, useOverridePose, initPoseZyx):
     tp_popup(message='Connected to ' + Global_ip)
     wait(waitTime)
     # you can use movel() with zyz Pose
-    # poseZyz = usercommand_sample_calcXyzToZyz(initPoseZyx)
     if useOverridePose:
-        movel_coord(posx(initPoseZyx)) # movel(posx(poseZyz))
+         movel(posx(usercommand_sample_calcXyzToZyz(initPoseZyx)))
     else:
-        movel_coord(posx(Global_initPoseZyx)) #movel(posx(usercommand_sample_calcXyzToZyz(Global_initPoseZyx)))
+        movel(posx(usercommand_sample_calcXyzToZyz(Global_initPoseZyx)))
 
 def usercommand_sample_calcXyzToZyz(pos):
     newRotation = rpy2eul([pos[3],pos[4],pos[5]])
