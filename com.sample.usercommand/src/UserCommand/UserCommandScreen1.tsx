@@ -75,6 +75,8 @@ export default class UserCommandScreen1 extends ModuleScreen {
     // Called when screen's visible state has been changed.
     onScreenVisible(visible: boolean): void {
         //logger.debug(`onScreenVisible: ${visible}`);
+        if (!visible) return;
+        
         this.db = new Database(this.moduleContext);
         const dbData = await this.db.getDataAll();
         this.setState({
