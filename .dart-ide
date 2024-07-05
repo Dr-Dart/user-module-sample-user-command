@@ -1,1 +1,177 @@
-{"key":"sample-user-command-basic_1.0.0_1_1684238719194","projectType":"Blank","projectGroup":null,"templateInfo":{"type":"Blank","title":"Blank","category":null,"group":null,"dartPackageInfo":{"title":"","group":"","type":"","category":""}},"packageName":"com.sample.usercommandbasic","ideMode":"basic","UserComponents":[{"type":"TaskPoseControl","component":"TaskPoseControl","category":"USER COMPONENT","extend":"react-component","tagName":"img","label":"TaskPoseControl","iconHover":true,"props":{"droppable":false,"exclude":["alt","src"],"traits":[{"type":"text-input-custom","label":"ID","name":"id","isUcIcon":true,"isBorderBottom":true,"placeholderValue":"Enter id name.","group":null},{"type":"uc_custom","groupProperties":[{"labelGroup":"Properties","properties":[{"key":"pointName","title":"pointName","type":"InputCustom","description":"Change name of title","exclude":""},{"key":"getPose","title":"getPose","type":"InputCustom","description":"Change name of button","exclude":""},{"key":"moveTo","title":"moveTo","type":"InputCustom","description":"Change name of button","exclude":""},{"key":"targetVelocity","title":"targetVelocity","type":"InputCustom","description":"Set movement velocity of Robot. Return data must be a TwoNumArray.","exclude":""},{"key":"targetAcceleration","title":"targetAcceleration","type":"InputCustom","description":"Set acceleration of Robot. Return data must be a TwoNumArray.","exclude":""},{"key":"targetTime","title":"targetTime","type":"InputCustom","description":"Set time to reach expectation position. Return data must be decimal and integer number.","exclude":""},{"key":"moveMode","title":"moveMode","type":"InputCustom","description":"Set move mode of Robot 0: Absolute| 1: Relative. Return data must be an integer number","exclude":""},{"key":"moveReference","title":"moveReference","type":"InputCustom","description":"Set st Coordinate 0: Base|2: World|User_coordinate. This property is used for moveLinearH2R API only. Return data must be an integer number","exclude":""},{"key":"blendingRadius","title":"blendingRadius","type":"InputCustom","description":"Set radius for blending. Return data must be a decimal or integer number","exclude":""},{"key":"blendingType","title":"blendingType","type":"InputCustom","description":"Set moving mode 0: Duplicate| 1 : Override. Return data must be an integer number","exclude":""},{"key":"stopType","title":"stopType","type":"InputCustom","description":"Set motion pause type 0: Stop, 1: Quick, 2: Slow, 3: Emergency. Return data must be an integer number","exclude":""},{"key":"solutionSpace","title":"solutionSpace","type":"InputCustom","description":"","exclude":"true"},{"key":"targetPose","title":"targetPose","type":"InputCustom","description":"Set initial value of position.","exclude":""}]}],"group":"document"}],"packageName":"task.pose.control","attributes":{"pointName":{"value":"{\"Point Name\"}"},"getPose":{"value":"{\"Get Position\"}"},"moveTo":{"value":"{\"Move To\"}"},"alt":"Image","src":"https://stg-templates.ide.drdart.io/component/user-component/task.pose.control/2/thumbnail.png","moduleContext":{"value":"{null}"}},"defaultTagName":"TaskPoseControl"},"ucType":"DEFAULT","path":"","version":"0.1.0","packageName":"task.pose.control","moduleKey":"","fileName":"task.pose.control.uc","sdkVersion":"2","canUpdate":false,"useSdkVersion":"2"}]}
+{
+    "key": "sample-user-command-basic_1.0.0_1_1684238719194",
+    "projectType": "Blank",
+    "projectGroup": null,
+    "templateInfo": {
+        "type": "Blank",
+        "title": "Blank",
+        "category": null,
+        "group": null,
+        "dartPackageInfo": {
+            "title": "",
+            "group": "",
+            "type": "",
+            "category": ""
+        }
+    },
+    "packageName": "com.sample.usercommand",
+    "ideMode": "basic",
+    "UserComponents": [
+        {
+            "type": "TaskPoseControl",
+            "component": "TaskPoseControl",
+            "category": "USER COMPONENT",
+            "extend": "react-component",
+            "tagName": "img",
+            "label": "TaskPoseControl",
+            "iconHover": true,
+            "props": {
+                "droppable": false,
+                "exclude": [
+                    "alt",
+                    "src"
+                ],
+                "traits": [
+                    {
+                        "type": "text-input-custom",
+                        "label": "ID",
+                        "name": "id",
+                        "isUcIcon": true,
+                        "isBorderBottom": true,
+                        "placeholderValue": "Enter id name.",
+                        "group": null
+                    },
+                    {
+                        "type": "uc_custom",
+                        "groupProperties": [
+                            {
+                                "labelGroup": "Properties",
+                                "properties": [
+                                    {
+                                        "key": "pointName",
+                                        "title": "pointName",
+                                        "type": "InputCustom",
+                                        "description": "Change name of title",
+                                        "exclude": ""
+                                    },
+                                    {
+                                        "key": "getPose",
+                                        "title": "getPose",
+                                        "type": "InputCustom",
+                                        "description": "Change name of button",
+                                        "exclude": ""
+                                    },
+                                    {
+                                        "key": "moveTo",
+                                        "title": "moveTo",
+                                        "type": "InputCustom",
+                                        "description": "Change name of button",
+                                        "exclude": ""
+                                    },
+                                    {
+                                        "key": "targetVelocity",
+                                        "title": "targetVelocity",
+                                        "type": "InputCustom",
+                                        "description": "Set movement velocity of Robot. Return data must be a TwoNumArray.",
+                                        "exclude": ""
+                                    },
+                                    {
+                                        "key": "targetAcceleration",
+                                        "title": "targetAcceleration",
+                                        "type": "InputCustom",
+                                        "description": "Set acceleration of Robot. Return data must be a TwoNumArray.",
+                                        "exclude": ""
+                                    },
+                                    {
+                                        "key": "targetTime",
+                                        "title": "targetTime",
+                                        "type": "InputCustom",
+                                        "description": "Set time to reach expectation position. Return data must be decimal and integer number.",
+                                        "exclude": ""
+                                    },
+                                    {
+                                        "key": "moveMode",
+                                        "title": "moveMode",
+                                        "type": "InputCustom",
+                                        "description": "Set move mode of Robot 0: Absolute| 1: Relative. Return data must be an integer number",
+                                        "exclude": ""
+                                    },
+                                    {
+                                        "key": "moveReference",
+                                        "title": "moveReference",
+                                        "type": "InputCustom",
+                                        "description": "Set st Coordinate 0: Base|2: World|User_coordinate. This property is used for moveLinearH2R API only. Return data must be an integer number",
+                                        "exclude": ""
+                                    },
+                                    {
+                                        "key": "blendingRadius",
+                                        "title": "blendingRadius",
+                                        "type": "InputCustom",
+                                        "description": "Set radius for blending. Return data must be a decimal or integer number",
+                                        "exclude": ""
+                                    },
+                                    {
+                                        "key": "blendingType",
+                                        "title": "blendingType",
+                                        "type": "InputCustom",
+                                        "description": "Set moving mode 0: Duplicate| 1 : Override. Return data must be an integer number",
+                                        "exclude": ""
+                                    },
+                                    {
+                                        "key": "stopType",
+                                        "title": "stopType",
+                                        "type": "InputCustom",
+                                        "description": "Set motion pause type 0: Stop, 1: Quick, 2: Slow, 3: Emergency. Return data must be an integer number",
+                                        "exclude": ""
+                                    },
+                                    {
+                                        "key": "solutionSpace",
+                                        "title": "solutionSpace",
+                                        "type": "InputCustom",
+                                        "description": "",
+                                        "exclude": "true"
+                                    },
+                                    {
+                                        "key": "targetPose",
+                                        "title": "targetPose",
+                                        "type": "InputCustom",
+                                        "description": "Set initial value of position.",
+                                        "exclude": ""
+                                    }
+                                ]
+                            }
+                        ],
+                        "group": "document"
+                    }
+                ],
+                "packageName": "task.pose.control",
+                "attributes": {
+                    "pointName": {
+                        "value": "{\"Point Name\"}"
+                    },
+                    "getPose": {
+                        "value": "{\"Get Position\"}"
+                    },
+                    "moveTo": {
+                        "value": "{\"Move To\"}"
+                    },
+                    "alt": "Image",
+                    "src": "https://stg-templates.ide.drdart.io/component/user-component/task.pose.control/2/thumbnail.png",
+                    "moduleContext": {
+                        "value": "{null}"
+                    }
+                },
+                "defaultTagName": "TaskPoseControl"
+            },
+            "ucType": "DEFAULT",
+            "path": "",
+            "version": "0.1.0",
+            "packageName": "task.pose.control",
+            "moduleKey": "",
+            "fileName": "task.pose.control.uc",
+            "sdkVersion": "2",
+            "canUpdate": false,
+            "useSdkVersion": "2"
+        }
+    ]
+}

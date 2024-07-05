@@ -78,17 +78,19 @@ export default class UserCommandScreen1 extends ModuleScreen {
         if (!visible) return;
         
         this.db = new Database(this.moduleContext);
-        const dbData = await this.db.getDataAll();
-        this.setState({
-            globalDeviceIp: dbData?.ip,
-            globalInitPose: dbData?.initPose,
-        });
-        
-        if (!this.state.useOverridePose){
+        this.db.getDataAll()
+        .then((dbData) => {
             this.setState({
-                initPose: dbData?.initPose,
+                globalDeviceIp: dbData?.ip,
+                globalInitPose: dbData?.initPose,
             });
-        }
+            
+            if (!this.state.useOverridePose){
+                this.setState({
+                    initPose: dbData?.initPose,
+                });
+            }
+        })
     }
 
     //OnBind. When Task Editor save Task, Send saved data.
