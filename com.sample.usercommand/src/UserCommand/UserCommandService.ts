@@ -31,14 +31,14 @@ export default class UserCommandService extends ModuleService {
         super(context)
         this.db = new Database(context)
     }
-    
+
     //onBind
     onBind(message: Message, channel: IModuleChannel): boolean {
         logger.debug(`User command onBind: ${this.moduleContext.componentId}, ${JSON.stringify(message)}`);
 
         const programManager = this.moduleContext.getSystemManager(Context.PROGRAM_MANAGER) as IProgramManager;
         const fileSystem = this.moduleContext.getSystemLibrary(Context.DART_FILE_SYSTEM) as IDartFileSystem;
-        
+
         /*********
         *   1. Event "req_to_save_commands_def_as_sub_program"
         *   Define and save Sub Program Function
@@ -50,19 +50,19 @@ export default class UserCommandService extends ModuleService {
 
             // 1-1. Define Sub Program function
             let subProgram = `from DRCF import *\r\n`
-            
+
             const dbData = await this.db.getDataAll() as IDBData;
-            subProgram += `Global_ip = "${dbData.ip}"\r\n` 
-            subProgram += `Global_initPoseZyx = [${dbData.initPose}]\r\n`
+            subProgram += `Global_ip = "${dbData.ip}"\r\n`
+            subProgram += `Global_initPoseZyx = [${dbData.initPose.pose}]\r\n`
 
             const drl = await fileSystem.readFile(this.moduleContext, drlPath);
             subProgram += drl
-            
+
             // 1-2. Save Sub Program function
             // logger.debug(`Sub_DRL : ${program}`);
             const result = await programManager.saveSubProgram(ProgramSaveMode.SAVE, programName, subProgram);
             channel.send("req_to_save_commands_def_as_sub_program", result);
-            
+
             // logger.debug(`Save Sub Program Result = ${result}`);
         });
 
@@ -74,7 +74,7 @@ export default class UserCommandService extends ModuleService {
         *********/
         channel.receive("gen_command_call", ({componentId, data}) => {
             //Execute statement for sub program
-            
+
             /*************
              *  2-1. Generate execute statement
              *  Update Gripper Value and Make execute statement
@@ -91,7 +91,7 @@ export default class UserCommandService extends ModuleService {
                 + `, `
                 +  `${data.useOverridePose? 'True' : 'False'}` //useOverridePose: boolean
                 + `, `
-                +  `[${data.initPose}]` //array or sixNumArray
+                +  `[${data.initPose.pose}]` //array or sixNumArray
                 + `)`
 
                 logger.debug(`gen command call(user command) : ${command} , ComponentID = ${componentId}, data = ${JSON.stringify(data)}`);
@@ -118,11 +118,11 @@ export default class UserCommandService extends ModuleService {
 
                 logger.debug(`gen command call(user command) : ${result} , ComponentID = ${componentId}, data = ${JSON.stringify(data)}`);
                 //case2. send object command call
-                // variableName is "" 
+                // variableName is ""
                 // {variableName} = calcXyzToZyz(zyxPose)
                 channel.send("gen_command_call", result);
             }
-            
+
         });//channel.receive(gen command call)
         return true;
     }//onBind

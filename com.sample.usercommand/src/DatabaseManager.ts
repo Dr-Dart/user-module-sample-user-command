@@ -19,12 +19,18 @@ export const TABLE_COLUMNS  = [TABLE_COLUMN_IP, TABLE_COLUMN_INIT_POSE]
 
 export interface IDBData{
   ip : string,
-  initPose : SixNumArray,
+  initPose : {
+    pose: SixNumArray,
+    coord: number
+  }
   //you can add another data in here
 }
 export const  InitialDBData = {
   ip : '192.168.137.1',
-  initPose : [0,0,0,0,0,0] as SixNumArray,
+  initPose : {
+    pose: [0,0,0,0,0,0] as SixNumArray,
+    coord: 0
+  }
   //you can add another initial data in here
 } as IDBData
 
@@ -50,7 +56,7 @@ export default class Database {
     // Enter the values in order to TABLE_COLUMNS[TABLE_COLUMN_IP, TABLE_COLUMN_INIT_POSE]
     // If it is a array or object, it must be saved as json.
     const values = [
-      JSON.stringify(InitialDBData.ip), 
+      JSON.stringify(InitialDBData.ip),
       JSON.stringify(InitialDBData.initPose)
     ]
     let result = await this.db.insert(TABLE_NAME, values) // insert(tableName: string, values: any[]): Promise<boolean>;
@@ -63,9 +69,9 @@ export default class Database {
     //Query DB Data
     let result = await this.db.query(TABLE_NAME, TABLE_COLUMNS, {}) //query(tableName: string, projection: string[], where: Record<string, any>): Promise<TableRow[]>;
     logger.debug(`[DB] getDataAll | result: ${JSON.stringify(result)}`);
-    
+
     if (result.length === 0) return null;
-    
+
     const data = {
       ip : JSON.parse(result[0].data.ip),
       initPose : JSON.parse(result[0].data.initPose)
@@ -83,7 +89,7 @@ export default class Database {
 
     return JSON.parse(result[0].data);
   };
-  
+
   public saveDataAll = async (data:IDBData) : Promise<boolean> => {
     const obj = {} as Record<string, any>;
     obj[TABLE_COLUMN_IP] = JSON.stringify(data.ip)

@@ -12,16 +12,22 @@
 def usercommand_sample_function(waitTime, useOverridePose, initPoseZyx):
     global Global_ip
     global Global_initPoseZyx
-    tp_popup(message='Connected to ' + Global_ip)
+    # tp_popup(message='Connected to ' + Global_ip)
     wait(waitTime)
-    # you can use movel() with zyz Pose
+    # you can use move() command using posx() without orientation type(zyz, zyx and more)
+    # programming manual: https://manual.doosanrobotics.com/en/programming/3.2.1/Publish/posx-x-0-y-0-z-0-a-0-b-0-c-0
     if useOverridePose:
-         movel(posx(usercommand_sample_calcXyzToZyz(initPoseZyx)))
+        posx_with_ori_type = posx(initPoseZyx, ori_type=DR_ELR_ZYX)
     else:
-        movel(posx(usercommand_sample_calcXyzToZyz(Global_initPoseZyx)))
+        posx_with_ori_type = posx(Global_initPoseZyx, ori_type=DR_ELR_ZYX)
+
+    movel(posx_with_ori_type)
 
 def usercommand_sample_calcXyzToZyz(pos):
+    # coordinate transformation Manually using rpy2eul()
+    # programming manual: https://manual.doosanrobotics.com/en/programming/3.2.1/Publish/rpy2eul-yaw-pitch-roll
     newRotation = rpy2eul([pos[3],pos[4],pos[5]])
     newPos = [pos[0],pos[1],pos[2],newRotation[0],newRotation[1],newRotation[2]]
-    tp_popup(message='pose convert from(zyx) ' + str(pos) + ' to(zyz)'+ str(newPos))
+    tp_popup(message='pose convert from zyx to zyz\nzyx: ' + str(pos) + '\nzyz: '+ str(newPos))
     return newPos
+

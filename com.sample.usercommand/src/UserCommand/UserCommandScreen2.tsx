@@ -52,7 +52,7 @@ export default class UserCommandScreen2 extends ModuleScreen {
         const dbData = await this.db.getDataAll();
         this.setState({
             //initPose value will be overwritten with the user-input value.
-            zyxPose: dbData?.initPose,
+            zyxPose: dbData?.initPose.pose,
         });
 
         if (this.message.data?.hasOwnProperty('savedData')) {

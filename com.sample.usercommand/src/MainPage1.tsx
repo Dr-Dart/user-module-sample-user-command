@@ -15,8 +15,6 @@ interface IMainPage1 {
 
 export default function MainPage1(props: IMainAppProps) {
     const [deviceIp, SetDeviceIp] = useState('');
-    const [pose, SetPose] = useState('');
-    const taskPoseRef = useRef<TaskPoseControlAPI>(null);
     const mathLibrary = props.moduleContext.getSystemLibrary(Context.MATH_LIBRARY) as IMathLibrary;
     //const { t } = useTranslation();
 
@@ -35,25 +33,10 @@ export default function MainPage1(props: IMainAppProps) {
 
         // Update state for changing IP in TextField UI Component
         SetDeviceIp(data?.ip);
-        SetPose(data?.initPose);
-        taskPoseRef.current?.onChange(savePoseCallback);
 
         // ComponentWillUnmount timing
         return () => {};
     }, []);
-
-    const savePoseCallback = async (poseZyx: SixNumArray) => {
-        let zyz = mathLibrary.convertEuler(
-            {
-                pose: poseZyx,
-                type: EulerType.ZYX,
-            },
-            EulerType.ZYZ,
-        );
-        logger.debug(`zyx: ${poseZyx} / zyz: ${zyz.pose}`);
-        SetPose(poseZyx);
-        await db.saveData(TABLE_COLUMN_INIT_POSE, poseZyx);
-    };
 
     return (
         <Box

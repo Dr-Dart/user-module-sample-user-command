@@ -1,3 +1,7 @@
+/*
+    BSD 3-Clause License    
+    Copyright (c) 2023, Doosan Robotics Inc.
+*/
 import { UserComponentProps, RobotSpace, SixNumArray, TwoNumArray } from "dart-api";
 import { Module } from "i18next";
 import { ModuleContext } from "./ModuleContext";

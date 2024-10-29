@@ -32,9 +32,15 @@ export default class UserCommandScreen1 extends ModuleScreen {
             waitTime: 0,
             useOverridePose: false,
             //initPose data from DB but it will be overwritten with the user-input value.
-            initPose: [0, 0, 0, 0, 0, 0],
+            initPose: {
+                pose: [0, 0, 0, 0, 0, 0],
+                coord: 0,
+            },
             //ip data from DB.
-            globalInitPose: [0, 0, 0, 0, 0, 0],
+            globalInitPose:{
+                pose: [0, 0, 0, 0, 0, 0],
+                coord: 0,
+            },
             globalDeviceIp: '',
         };
     }
@@ -46,12 +52,18 @@ export default class UserCommandScreen1 extends ModuleScreen {
         const dbData = await this.db.getDataAll();
         this.setState({
             globalDeviceIp: dbData?.ip,
-            globalInitPose: dbData?.initPose,
+            globalInitPose: {
+                pose: dbData?.initPose.pose,
+                coord: dbData?.initPose.coord
+            },
         });
-        
+
         if (!this.state.useOverridePose){
             this.setState({
-                initPose: dbData?.initPose,
+                initPose: {
+                    pose: dbData?.initPose.pose,
+                    coord: dbData?.initPose.coord
+                },
             });
         }
 
@@ -76,18 +88,24 @@ export default class UserCommandScreen1 extends ModuleScreen {
     onScreenVisible(visible: boolean): void {
         //logger.debug(`onScreenVisible: ${visible}`);
         if (!visible) return;
-        
+
         this.db = new Database(this.moduleContext);
         this.db.getDataAll()
         .then((dbData) => {
             this.setState({
                 globalDeviceIp: dbData?.ip,
-                globalInitPose: dbData?.initPose,
+                globalInitPose: {
+                    pose: dbData?.initPose.pose,
+                    coord: dbData?.initPose.coord
+                },
             });
-            
+
             if (!this.state.useOverridePose){
                 this.setState({
-                    initPose: dbData?.initPose,
+                    initPose: {
+                        pose: dbData?.initPose.pose,
+                        coord: dbData?.initPose.coord
+                    },
                 });
             }
         })
@@ -135,8 +153,10 @@ export default class UserCommandScreen1 extends ModuleScreen {
             useOverridePose: data.useOverridePose,
         });
 
+        const pose = data.useOverridePose ? data.initPose.pose : [...this.state.globalInitPose.pose];
+        const coord = this.state.initPose.coord;
         this.setState({
-            initPose: data.useOverridePose? data.initPose : this.state.globalInitPose,
+            initPose: {pose, coord},
         });
     }
 
@@ -146,24 +166,27 @@ export default class UserCommandScreen1 extends ModuleScreen {
         })
     }
 
-    handleChangeinitPose = (event : any) => {
-        this.setState({
-            initPose: event.target.value,
-        })
+    handleChangeInitPose = (event : any) => {
+        this.setState((prevState) => ({
+            initPose: {
+                ...prevState.initPose,
+                pose: event.target.value
+            },
+        }))
     }
 
     handleChangeUseOverride = (event : any) => {
-        let used = !this.state.useOverridePose;
+        const used = !this.state.useOverridePose;
         this.setState(
             {
                 useOverridePose: used,
             },
             this.sendDataToTaskEditor,
         );
-        
+
         if (!used){
             this.setState({
-                initPose: this.state.globalInitPose,
+                initPose:  {...this.state.globalInitPose},
             });
         }
     }
@@ -302,7 +325,7 @@ export default class UserCommandScreen1 extends ModuleScreen {
                                 label="Use Override"
                                 labelPlacement="start"
                             />
-                            
+
                         </Grid>
                         <Grid
                             item={true}
@@ -318,9 +341,9 @@ export default class UserCommandScreen1 extends ModuleScreen {
                                 InputProps={{
                                     'readOnly': !this.state.useOverridePose,
                                 }}
-                                value={this.state.initPose}
+                                value={this.state.initPose.pose}
                                 // 6. Change the state value when the onChange Event occurs in TextField.
-                                onChange={this.handleChangeinitPose}
+                                onChange={this.handleChangeInitPose}
                                 onBlur={this.sendDataToTaskEditor}
                             />
                         </Grid>

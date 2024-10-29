@@ -1235,6 +1235,12 @@ export type EthernetIpData = {
      */
     data: string
 }
+/**
+ * Information on the Industrial Ethernet.
+ * @api-version 2
+ * @user
+ */
+export type IEData = EthernetIpData;
 
 /**
  * This is an enumeration type constant that refers to the authority of the robot controller, and is defined as follows.
@@ -1920,9 +1926,21 @@ export const EthernetIpGprDataType = {
     FLOAT: 2
 } as const;
 /**
+ * Industrial Ethernet general purpose register data type.
+ *
+ * @enum
+ * @api-version 2
+ * @user
+ */
+export const IEGprDataType = EthernetIpGprDataType;
+/**
  * @ignore
  */
 export type EthernetIpGprDataType = typeof EthernetIpGprDataType[keyof typeof EthernetIpGprDataType];
+/**
+ * @ignore
+ */
+export type IEGprDataType = typeof IEGprDataType[keyof typeof IEGprDataType];
 
 /**
  * This is an enumeration type constant that refers to the GPIO digital input/output terminal installed in the edge of the robot, and is defined as follows.
@@ -4832,6 +4850,14 @@ export type EthernetIpMonitoringModbusCoil = {
 }
 
 /**
+ * Modbus slave coil information
+ *
+ * @api-version 2
+ * @user
+ */
+export type IEMonitoringModbusCoil = EthernetIpMonitoringModbusCoil
+
+/**
  * Modbus slave register information
  *
  * @api-version 1
@@ -4911,17 +4937,80 @@ export type EthernetIpMonitoringModbusRegister = {
     /**
      * Tool digital input 1~6 (H Reg 21) read only
      *
-     * @api-version 1
+     * @api-version 2
      * @user
      */
-    ctrlToolDigitalInput: number,
+    toolDigitalInput: SixNumArray,
     /**
      * Tool digital output 1~6 (H Reg 22) write only
      *
-     * @api-version 1
+     * @api-version 2
      * @user
      */
-    ctrlToolDigitalOutput: number,
+    toolDigitalOutput: SixNumArray,
+    /**
+     * Tool analog intput 1 (H Reg 23) read only
+     *
+     * @api-version 2
+     * @user
+     */
+    toolAnalogInput1: number,
+    /**
+     * The type of tool analog intput 1 (H Reg 24) read only
+     *
+     * @api-version 2
+     * @user
+     */
+    toolAnalogInputType1: number,
+    /**
+     * Tool analog intput 2 (H Reg 25) read only
+     *
+     * @api-version 2
+     * @user
+     */
+    toolAnalogInput2: number,
+    /**
+     * The type of tool analog intput 2 (H Reg 26) read only
+     *
+     * @api-version 2
+     * @user
+     */
+    toolAnalogInputType2: number,
+    /**
+     * The type of tool analog intput 3 (H Reg 27) read only
+     *
+     * @api-version 2
+     * @user
+     */
+    toolAnalogInput3: number,
+    /**
+     * The type of tool analog intput 3 (H Reg 28) read only
+     *
+     * @api-version 2
+     * @user
+     */
+    toolAnalogInputType3: number,
+    /**
+     * The type of tool analog intput 4 (H Reg 29) read only
+     *
+     * @api-version 2
+     * @user
+     */
+    toolAnalogInput4: number,
+    /**
+     * The type of tool analog intput 4 (H Reg 30) read only
+     *
+     * @api-version 2
+     * @user
+     */
+    toolAnalogInputType4: number,
+    /**
+     * Tool voltage output level (H Reg 31) read only
+     *
+     * @api-version 2
+     * @user
+     */
+    toolVoltageOutputLevel: number,
     /**
      * General pupose 16bit register (size 128) (H Reg 128~255) read/write
      *
@@ -5056,6 +5145,13 @@ export type EthernetIpMonitoringModbusRegister = {
      */
     taskExternalForce: SixNumArray,
 }
+/**
+ * Modbus slave register information
+ *
+ * @api-version 2
+ * @user
+ */
+export type IEMonitoringModbusRegister = EthernetIpMonitoringModbusRegister
 
 /**
  * General purpose data
@@ -5072,6 +5168,14 @@ export type EthernetIpMonitoringGpr = {
      */
     gpr: number[]
 };
+
+/**
+ * General purpose data
+ *
+ * @api-version 2
+ * @user
+ */
+export type IEMonitoringGpr = EthernetIpMonitoringGpr;
 
 /**
  * Ethernet ip monitoring data
@@ -5101,6 +5205,36 @@ export type EthernetIpMonitoring = {
      * @user
      */
     industrialEthernetGPR: EthernetIpMonitoringGpr
+}
+
+/**
+ * IndustrialEthernet monitoring data
+ *
+ * @api-version 2
+ * @user
+ */
+export type IEMonitoring = {
+    /**
+     * Modbus coil
+     *
+     * @api-version 2
+     * @user
+     */
+    mbusCoil: IEMonitoringModbusCoil,
+    /**
+     * Modbus register
+     *
+     * @api-version 2
+     * @user
+     */
+    mbusHoldingRegister: IEMonitoringModbusRegister,
+    /**
+     * General pulpose data
+     *
+     * @api-version 2
+     * @user
+     */
+    industrialEthernetGPR: IEMonitoringGpr
 }
 
 /**
@@ -10024,6 +10158,14 @@ export const ModulePackageInstallErrorCode = {
      * @user
      */
     ERROR_INVALID_VERSION: 0x0100_0001,
+
+    /**
+     * Failed to update the module package because buyer account has been changed.
+     *
+     * @api-version 2
+     * @user
+     */
+    ERROR_BUYER_ACCOUNT_CHANGED: 0x0100_0002,
     // [END] UPDATE ERRORS /////////////////////////
 
 
@@ -15966,6 +16108,17 @@ export interface IRobotParameterManager extends ISystemManager {
     setHomingOption(data: HomingOption): Promise<boolean>;
 
     /**
+     * set wheter to use custom home position.
+     *
+     * @param use use moveToUserHome(true), use moveToHWHome(false)
+     * @return Promise<boolean>
+     *
+     * @api-version 2
+     * @system
+     */
+    setUseUserHome(use: boolean): Promise<boolean>;
+
+    /**
      * get option of move home
      *
      * @return move home option.
@@ -16054,8 +16207,18 @@ export interface ICommunicationManager extends ISystemManager {
      *
      * @api-version 1
      * @user
+     * @deprecated
      */
     ethernetIp: IEthernetIP
+
+    /**
+     * industrialEthernet have device connection using industrialEthernet communication
+     * For example, setting that EthernetIp data
+     *
+     * @api-version 2
+     * @user
+     */
+    industrialEthernet: IIndustrialEthernet
 }
 
 /**
@@ -16924,6 +17087,7 @@ export interface IFocas {
  *
  * @api-version 1
  * @user
+ * @deprecated
  */
 export interface IEthernetIP {
     /**
@@ -16932,6 +17096,7 @@ export interface IEthernetIP {
      *
      * @api-version 1
      * @user
+     * @deprecated
      */
     readonly ieSlave: Monitorable<EthernetIpMonitoring>;
 
@@ -16942,6 +17107,7 @@ export interface IEthernetIP {
      *
      * @api-version 1
      * @system
+     * @deprecated
      */
     setMonitoring(start: boolean): Promise<boolean>;
 
@@ -16955,6 +17121,7 @@ export interface IEthernetIP {
      *
      * @api-version 1
      * @user
+     * @deprecated
      */
     getInputRegisterBit(gprType: EthernetIpGprDataType, gprAddress: number, portType: number) : Promise<EthernetIpData>;
 
@@ -16969,8 +17136,63 @@ export interface IEthernetIP {
      *
      * @api-version 1
      * @user
+     * @deprecated
      */
     setOutputRegisterBit(gprType: EthernetIpGprDataType, gprAddress: number, data: string) : Promise<boolean>;
+}
+
+/**
+ * IIndustrialEthernet have api and monitoring data variable. These elements are related to Industrial Ethernet communication function.
+ *
+ * @api-version 2
+ * @user
+ */
+export interface IIndustrialEthernet {
+    /**
+     * {@link Monitorable}
+     * {@link IEMonitoring}
+     *
+     * @api-version 2
+     * @user
+     */
+    readonly ieSlave: Monitorable<IEMonitoring>;
+
+    /**
+     * Setting whether to monitor industrial Ethernet status
+     * @param start monitoring 0: stop 1: start
+     * @return Promise<boolean> returns true if successful, false if unsuccessful.
+     *
+     * @api-version 2
+     * @system
+     */
+    setMonitoring(start: boolean): Promise<boolean>;
+
+    /**
+     * Get an industrial ethernet protocol general purpose register value
+     *
+     * @param gprType data type. 0:bit, 1:int, 2:float
+     * @param gprAddress address
+     * @param portType 0:in, 1:out
+     * @return Return <Promise> Fulfills with the {@link EthernetIpData}.
+     *
+     * @api-version 2
+     * @user
+     */
+    getInputRegister(gprType: IEGprDataType, gprAddress: number, portType: number) : Promise<IEData>;
+
+    /**
+     * Set an industrial ethernet protocol general purpose register value.
+     * <br>Controls and alters the Industrial Ethernet GPR output.
+     *
+     * @param gprType data type. 0:bit, 1:int, 2:float
+     * @param gprAddress Variable address
+     * @param data Variable output data- 128 byte string
+     * @return Return <Promise> Fulfills with true if the request has been operated successfully, otherwise false.
+     *
+     * @api-version 2
+     * @user
+     */
+    setOutputRegister(gprType: IEGprDataType, gprAddress: number, data: string) : Promise<boolean>;
 }
 
 /**

@@ -15,8 +15,9 @@ interface IMainPage2 {
 }
 
 export default function MainPage2(props: IMainAppProps) {
-    const [deviceIp, SetDeviceIp] = useState('');
-    const [pose, SetPose] = useState('');
+    const [coord, SetCoord] = useState(0);
+    const [pose, SetPose] = useState([0, 0, 0, 0, 0, 0] as SixNumArray);
+
     const taskPoseRef = useRef<TaskPoseControlAPI>(null);
     const mathLibrary = props.moduleContext.getSystemLibrary(Context.MATH_LIBRARY) as IMathLibrary;
     //const { t } = useTranslation();
@@ -34,9 +35,8 @@ export default function MainPage2(props: IMainAppProps) {
         // const ip = await db.getData(TABLE_COLUMN_IP);
         // const initPose = await db.getData(TABLE_COLUMN_INIT_POSE);
 
-        // Update state for changing IP in TextField UI Component
-        SetDeviceIp(data?.ip);
-        SetPose(data?.initPose);
+        SetPose(data?.initPose.pose);
+        SetCoord(data?.initPose.coord);
         taskPoseRef.current?.onChange(savePoseCallback);
 
         // ComponentWillUnmount timing
@@ -44,16 +44,21 @@ export default function MainPage2(props: IMainAppProps) {
     }, []);
 
     const savePoseCallback = async (poseZyx: SixNumArray) => {
-        let zyz = mathLibrary.convertEuler(
-            {
-                pose: poseZyx,
-                type: EulerType.ZYX,
-            },
-            EulerType.ZYZ,
-        );
-        logger.debug(`zyx: ${poseZyx} / zyz: ${zyz.pose}`);
+        // let zyz = mathLibrary.convertEuler(
+        //     {
+        //         pose: poseZyx,
+        //         type: EulerType.ZYX,
+        //     },
+        //     EulerType.ZYZ,
+        // );
+        // logger.debug(`zyx: ${poseZyx}, zyz: ${zyz.pose}`);
+        // logger.debug(`coord:${coord}`);
+        SetCoord(coord);
         SetPose(poseZyx);
-        await db.saveData(TABLE_COLUMN_INIT_POSE, poseZyx);
+        await db.saveData(TABLE_COLUMN_INIT_POSE, {
+            pose: poseZyx,
+            coord: coord
+        });
     };
 
     return (
@@ -97,6 +102,7 @@ export default function MainPage2(props: IMainAppProps) {
                         moduleContext={props.moduleContext}
                         id="taskposecontrol_81d7"
                         ref={taskPoseRef}
+                        // moveReference={coord}
                         targetPose={pose}
                     ></TaskPoseControl>
                 </Box>
