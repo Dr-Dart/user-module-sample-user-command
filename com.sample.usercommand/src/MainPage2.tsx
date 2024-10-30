@@ -14,7 +14,7 @@ interface IMainPage2 {
     moduleContext: ModuleContext;
 }
 
-export default function MainPage2(props: IMainAppProps) {
+export default function MainPage2(props: IMainPage2) {
     const [coord, SetCoord] = useState(0);
     const [pose, SetPose] = useState([0, 0, 0, 0, 0, 0] as SixNumArray);
 
@@ -53,8 +53,8 @@ export default function MainPage2(props: IMainAppProps) {
         // );
         // logger.debug(`zyx: ${poseZyx}, zyz: ${zyz.pose}`);
         // logger.debug(`coord:${coord}`);
-        SetCoord(coord);
-        SetPose(poseZyx);
+        // SetCoord(coord);
+        // SetPose(poseZyx);
         await db.saveData(TABLE_COLUMN_INIT_POSE, {
             pose: poseZyx,
             coord: coord

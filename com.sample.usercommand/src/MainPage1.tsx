@@ -13,7 +13,7 @@ interface IMainPage1 {
     moduleContext: ModuleContext;
 }
 
-export default function MainPage1(props: IMainAppProps) {
+export default function MainPage1(props: IMainPage1) {
     const [deviceIp, SetDeviceIp] = useState('');
     const mathLibrary = props.moduleContext.getSystemLibrary(Context.MATH_LIBRARY) as IMathLibrary;
     //const { t } = useTranslation();
