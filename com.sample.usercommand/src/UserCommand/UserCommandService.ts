@@ -128,6 +128,7 @@ export default class UserCommandService extends ModuleService {
           result = {
             command: command,
             variableName: data.variableSelected,
+            validity: true,
           };
         }
 

@@ -154,6 +154,7 @@ export default class UserCommandScreen2 extends ModuleScreen {
     const data: Record<string, any> = {};
     data['zyxPose'] = this.state.zyxPose;
     data['variableSelected'] = this.state.variableSelected;
+    data['globalSystemVariable'] = this.state.globalSystemVariable;
 
     logger.debug(`Send current data : ${JSON.stringify(data)}`);
     return data;
@@ -164,6 +165,7 @@ export default class UserCommandScreen2 extends ModuleScreen {
       zyxPose: data.zyxPose,
       //for Global/System Variable
       variableSelected: data.variableSelected,
+      globalSystemVariable: data.globalSystemVariable,
     });
   };
 
