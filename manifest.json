@@ -5,5 +5,5 @@
     "sdkVersion": "2",
     "icon": "assets/images/icon.png",
     "drscModulePackageFile": "drsc_com.sample.usercommand.dm",
-    "drcfModulePackageFile  ": ""
+    "drcfModulePackageFile": ""
 }
