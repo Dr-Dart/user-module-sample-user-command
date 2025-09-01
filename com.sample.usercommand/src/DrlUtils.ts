@@ -2,7 +2,14 @@
     BSD 3-Clause License
     Copyright (c) 2023, Doosan Robotics Inc.
 */
-import { Context, IDartFileSystem, IProgramManager, ModuleContext, SubProgram, MonitoringVariable } from 'dart-api';
+import {
+  Context,
+  IDartFileSystem,
+  IProgramManager,
+  ModuleContext,
+  SubProgram,
+  MonitoringVariable,
+} from 'dart-api';
 
 export default class DrlUtils {
   private fieldDataMap: Map<string, string | number | boolean>;
@@ -54,25 +61,42 @@ export default class DrlUtils {
     mainProgramFilePath: string,
     subProgram: SubProgram[] | null,
     monitoringVariables: MonitoringVariable[] | null,
-    useDebug: boolean
+    useDebug: boolean,
   ) {
     let result = false;
-    const fileSystem = moduleContext.getSystemLibrary(Context.DART_FILE_SYSTEM) as IDartFileSystem;
+    const fileSystem = moduleContext.getSystemLibrary(
+      Context.DART_FILE_SYSTEM,
+    ) as IDartFileSystem;
     const rootFilePath = fileSystem.getModuleRootDirPath(moduleContext);
     const regex = new RegExp(`.*(${rootFilePath})`);
     const drlAbsolutePath = mainProgramFilePath.replace(regex, `$1`);
     if (await fileSystem.exists(drlAbsolutePath)) {
-      let drlContent = await fileSystem.readFile(moduleContext, drlAbsolutePath);
+      let drlContent = await fileSystem.readFile(
+        moduleContext,
+        drlAbsolutePath,
+      );
       // convert from JS boolean to number for python
-      const appData = this.convertBooleanToNumberProps(Object.fromEntries(this.fieldDataMap));
-      drlContent = `app_data = ${JSON.stringify(appData) + '\r\n'}` + drlContent;
-      const programManager = moduleContext.getSystemManager(Context.PROGRAM_MANAGER) as IProgramManager;
-      result = await programManager.runProgram(drlContent, subProgram, monitoringVariables, useDebug);
+      const appData = this.convertBooleanToNumberProps(
+        Object.fromEntries(this.fieldDataMap),
+      );
+      drlContent =
+        `app_data = ${JSON.stringify(appData) + '\r\n'}` + drlContent;
+      const programManager = moduleContext.getSystemManager(
+        Context.PROGRAM_MANAGER,
+      ) as IProgramManager;
+      result = await programManager.runProgram(
+        drlContent,
+        subProgram,
+        monitoringVariables,
+        useDebug,
+      );
     }
     return result;
   }
 
-  public convertBooleanToNumberProps(obj: { [k: string]: string | number | boolean }) {
+  public convertBooleanToNumberProps(obj: {
+    [k: string]: string | number | boolean;
+  }) {
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'boolean') {
         obj[key] = value ? 1 : 0;

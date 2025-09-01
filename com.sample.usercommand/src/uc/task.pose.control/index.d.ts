@@ -2,16 +2,19 @@
     BSD 3-Clause License    
     Copyright (c) 2023, Doosan Robotics Inc.
 */
-import { UserComponentProps, RobotSpace, SixNumArray, TwoNumArray } from "dart-api";
-import { Module } from "i18next";
-import { ModuleContext } from "./ModuleContext";
+import {
+  UserComponentProps,
+  RobotSpace,
+  SixNumArray,
+  TwoNumArray,
+} from 'dart-api';
 
 type Enumerate<
   N extends number,
-  Acc extends number[] = []
-> = Acc["length"] extends N
+  Acc extends number[] = [],
+> = Acc['length'] extends N
   ? Acc[number]
-  : Enumerate<N, [...Acc, Acc["length"]]>;
+  : Enumerate<N, [...Acc, Acc['length']]>;
 type IntRange<F extends number, T extends number> = Exclude<
   Enumerate<T>,
   Enumerate<F>
@@ -65,7 +68,7 @@ export interface TaskPoseControlAPI {
     moveMode: number,
     moveReference: number,
     blendingRadius: number,
-    blendingType: number
+    blendingType: number,
   ) => Promise<boolean | undefined>;
 
   /**
