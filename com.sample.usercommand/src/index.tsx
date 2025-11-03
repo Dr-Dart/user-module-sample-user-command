@@ -14,13 +14,19 @@ import {
 import React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { Box, Button, Grid } from '@mui/material';
+import SettingsIcon from '@mui/icons-material/Settings';
+import RouteIcon from '@mui/icons-material/Route';
 import DrlUtils from './DrlUtils';
 import IconImageYourCompanyLogo from './assets/images/image_your_company_logo.png';
 import UserCommandPipScreen1 from './UserCommand/UserCommandScreen1';
 import UserCommandPipScreen2 from './UserCommand/UserCommandScreen2';
+import UserCommandPipScreen3 from './UserCommand/UserCommandScreen3';
 import UserCommandService from './UserCommand/UserCommandService';
 import MainPage1 from './MainPage1';
 import MainPage2 from './MainPage2';
+import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorFallback } from './ErrorFallback';
+import styles from './index.scss'; // Import the SCSS file
 
 // IIFE for register a function to create an instance of main class which is inherited BaseModule.
 (() => {
@@ -28,6 +34,7 @@ import MainPage2 from './MainPage2';
     (packageInfo) => new Module(packageInfo),
   );
 })();
+
 class Module extends BaseModule {
   /*********
    * getModuleScreen
@@ -53,6 +60,11 @@ class Module extends BaseModule {
     if (componentId === 'usercommand_id2') {
       return UserCommandPipScreen2;
     }
+    // Custom Folder (Start-End structure)
+    // Task Editor will automatically create the End command
+    if (componentId === 'usercommand_folder') {
+      return UserCommandPipScreen3;
+    }
     return null;
   }
 
@@ -69,6 +81,7 @@ class Module extends BaseModule {
     return UserCommandService;
   }
 }
+
 class MainScreen extends ModuleScreen {
   constructor(props: ModuleScreenProps) {
     //Add State. One state is required for each input component on the screen.
@@ -91,80 +104,38 @@ class MainScreen extends ModuleScreen {
   };
   render() {
     return (
-      <ThemeProvider theme={this.systemTheme}>
-        <Box
-          sx={{
-            'height': '80px',
-            'width': '100%',
-            'border': '0.1px solid #ccc',
-            'borderRadius': 0,
-            'boxShadow': '0 0 0 1px #ccc',
-            'display': 'flex',
-          }}
-        >
-          <Box
-            id="typography_3f57"
-            sx={{
-              flex: '0.9',
-              'fontSize': '24px',
-              'fontWeight': 'bold',
-              'paddingLeft': '20px',
-              'paddingTop': '24px',
-            }}
-          >
-            Global Settings Sample
+      <ErrorBoundary
+        FallbackComponent={ErrorFallback}
+        onError={(error, errorInfo) => {
+          logger.error(`[MainScreen] Error caught: ${error.message}`);
+          logger.error(`[MainScreen] Component Stack: ${errorInfo.componentStack}`);
+        }}
+      >
+        <ThemeProvider theme={this.systemTheme}>
+          <Box className={styles['main-screen-container']}>
+            <Box className={styles['main-screen-header']}>
+              <Box id="typography_3f57" className={styles['header-title']}>
+                Global Settings Sample
+              </Box>
+              <Box id="box_img" className={styles['header-logo']}>
+                <img
+                  alt={'alternative'}
+                  id="img_19bf"
+                  src={IconImageYourCompanyLogo}
+                />
+              </Box>
+            </Box>
+            <Box className={styles['main-screen-body']}>
+              <Box className={styles['sidebar']}>
+                <PageButtons page={this.state.page} setPage={this.handleSetPage} />
+              </Box>
+              <Box className={styles['content-area']}>
+                <Page moduleContext={this.moduleContext} page={this.state.page} />
+              </Box>
+            </Box>
           </Box>
-          <Box
-            id="box_img"
-            sx={{
-              flex: '0.1',
-              'fontSize': '24px',
-              'fontWeight': 'bold',
-              'paddingRight': '20px',
-              'paddingTop': '18px',
-            }}
-          >
-            <img
-              alt={'alternative'}
-              id="img_19bf"
-              src={IconImageYourCompanyLogo}
-              style={{
-                width: '200px',
-                height: '41.31px',
-              }}
-            />
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            'height': 'calc(100% - 80px)',
-            'width': '100%',
-            'display': 'flex',
-          }}
-        >
-          <Box
-            sx={{
-              'width': '190px',
-              'padding': '10px',
-              'border': '0.1px solid #ccc',
-              'borderRadius': 0,
-              'boxShadow': '0 0 0 1px #ccc',
-            }}
-          >
-            <PageButtons page={this.state.page} setPage={this.handleSetPage} />
-          </Box>
-          <Box
-            sx={{
-              'width': 'calc(100% - 190px)',
-              'border': '0.1px solid #ccc',
-              'borderRadius': 0,
-              'boxShadow': '0 0 0 1px #ccc',
-            }}
-          >
-            <Page moduleContext={this.moduleContext} page={this.state.page} />
-          </Box>
-        </Box>
-      </ThemeProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
     );
   }
 }
@@ -176,35 +147,26 @@ function PageButtons(props: IPageButtons) {
   const { page, setPage } = props;
   // const { t } = useTranslation();
   return (
-    <Grid>
+    <Grid className={styles['page-buttons-grid']}>
       <Button
-        sx={{
-          'width': '100%',
-          'height': '50px',
-          'display': 'inline',
-          'textAlign': 'left',
-        }}
+        variant={page === 0 ? 'contained' : 'outlined'}
+        className={styles['page-button']}
+        startIcon={<SettingsIcon />}
         onClick={() => {
           setPage(0);
         }}
-        disabled={page === 0 ? true : false}
       >
-        1. Set Device IP
+        Set Device IP
       </Button>
       <Button
-        sx={{
-          'marginTop': '10px',
-          'width': '100%',
-          'height': '50px',
-          'display': 'inline',
-          'textAlign': 'left',
-        }}
+        variant={page === 1 ? 'contained' : 'outlined'}
+        className={styles['page-button']}
+        startIcon={<RouteIcon />}
         onClick={() => {
           setPage(1);
         }}
-        disabled={page === 1 ? true : false}
       >
-        2. Set Initial Pose
+        Set Initial Pose
       </Button>
     </Grid>
   );

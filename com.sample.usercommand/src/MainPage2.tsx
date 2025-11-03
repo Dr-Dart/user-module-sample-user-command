@@ -4,12 +4,15 @@
 */
 import { ModuleContext, SixNumArray } from 'dart-api';
 import React, { useState, useEffect, useRef } from 'react';
-import { Box } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
+import RouteIcon from '@mui/icons-material/Route';
 import TaskPoseControl, { TaskPoseControlAPI } from './uc/task.pose.control';
 import Database, {
   InitialDBData,
   TABLE_COLUMN_INIT_POSE,
 } from './DatabaseManager';
+import styles from './MainPage2.scss';
+
 interface IMainPage2 {
   moduleContext: ModuleContext;
 }
@@ -20,15 +23,11 @@ export default function MainPage2(props: IMainPage2) {
 
   const taskPoseRef = useRef<TaskPoseControlAPI>(null);
 
-  const db = new Database(props.moduleContext);
+  const db = Database.getInstance(props.moduleContext);
 
   useEffect(() => {
-    // ComponentDidMount timing
     const isInit = async () => {
-      // Get Ip from database
-      await db.initialize();
       let data = await db.getDataAll();
-
       if (data === null) data = InitialDBData;
 
       SetPose(data.initPose.pose);
@@ -36,26 +35,9 @@ export default function MainPage2(props: IMainPage2) {
       taskPoseRef.current?.onChange(savePoseCallback);
     };
     isInit();
-
-    // ComponentWillUnmount timing
-    //return () => {};
   }, []);
 
   const savePoseCallback = async (poseZyx: SixNumArray) => {
-    // const mathLibrary = props.moduleContext.getSystemLibrary(
-    //   Context.MATH_LIBRARY,
-    // ) as IMathLibrary;
-    // let zyz = mathLibrary.convertEuler(
-    //     {
-    //         pose: poseZyx,
-    //         type: EulerType.ZYX,
-    //     },
-    //     EulerType.ZYZ,
-    // );
-    // logger.debug(`zyx: ${poseZyx}, zyz: ${zyz.pose}`);
-    // logger.debug(`coord:${coord}`);
-    // SetCoord(coord);
-    // SetPose(poseZyx);
     await db.saveData(TABLE_COLUMN_INIT_POSE, {
       pose: poseZyx,
       coord: coord,
@@ -63,50 +45,33 @@ export default function MainPage2(props: IMainPage2) {
   };
 
   return (
-    <Box
-      sx={{
-        'height': '40px',
-        'marginLeft': '20px',
-        'marginTop': '20px',
-      }}
-      id="box_18c8"
-    >
-      <Box
-        sx={{
-          alignItems: 'left',
-          display: 'block',
-          'height': '300px',
-          'width': '460px',
-        }}
-        id="box_323f"
-      >
-        <Box
-          sx={{
-            'fontFamily': 'Noto Sans',
-            'fontWeight': 'bold',
-            'height': '40px',
-            'width': '200px',
-          }}
-        >
-          2.Set initial pose
-        </Box>
-        <Box
-          sx={{
-            'height': '40px',
-            'width': '200px',
-          }}
-        >
-          <TaskPoseControl
-            pointName={'Point Name'}
-            getPose={'Get Position'}
-            moveTo={'Move To'}
-            moduleContext={props.moduleContext}
-            ref={taskPoseRef}
-            // moveReference={coord}
-            targetPose={pose}
-          />
+    <Paper elevation={0} className={styles['content-card']}>
+      <Box className={styles['card-header']}>
+        <RouteIcon className={styles['card-header-icon']} />
+        <Typography variant="h5" component="h2" className={styles['card-title']}>
+          Initial Pose Setting
+        </Typography>
+      </Box>
+      <Typography variant="body2" className={styles['card-subtitle']}>
+        Define the initial robot pose for your application workflow
+      </Typography>
+      <Box className={styles['pose-control-wrapper']}>
+        <Box className={styles['pose-control-container']}>
+          <Typography className={styles['input-label']} component="label">
+            Robot Position Configuration
+          </Typography>
+          <Box className={styles['pose-control-inner']}>
+            <TaskPoseControl
+              pointName={'Point Name'}
+              getPose={'Get Position'}
+              moveTo={'Move To'}
+              moduleContext={props.moduleContext}
+              ref={taskPoseRef}
+              targetPose={pose}
+            />
+          </Box>
         </Box>
       </Box>
-    </Box>
+    </Paper>
   );
 }

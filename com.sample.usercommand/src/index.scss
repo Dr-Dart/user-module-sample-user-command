@@ -1,0 +1,184 @@
+@import './assets/styles/theme';
+
+/* MainScreen styles */
+.main-screen-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7fa;
+  font-family: $base-font-family;
+}
+
+.main-screen-header {
+  height: 70px;
+  width: 100%;
+  background: #2c3e50;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.header-title {
+  flex: 1;
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  letter-spacing: -0.3px;
+}
+
+.header-logo {
+  flex-shrink: 0;
+  img {
+    width: 140px;
+    height: auto;
+    display: block;
+  }
+}
+
+.main-screen-body {
+  flex-grow: 1;
+  width: 100%;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  gap: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.sidebar {
+  width: 240px;
+  padding: 24px 0;
+  background: #ffffff;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e5e7eb;
+  gap: 4px;
+}
+
+.content-area {
+  flex-grow: 1;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 32px;
+  background: #f5f7fa;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+
+    &:hover {
+      background: #94a3b8;
+    }
+  }
+}
+
+/* PageButtons styles */
+.page-buttons-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0 16px;
+}
+
+.page-button {
+  width: 100%;
+  height: 48px;
+  justify-content: flex-start !important;
+  text-align: left;
+  text-transform: none !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+  position: relative;
+  padding: 0 16px !important;
+  margin-bottom: 2px !important;
+
+  // Icon styling
+  .MuiButton-startIcon {
+    margin-right: 12px;
+    font-size: 20px;
+  }
+
+  // Styles for outlined buttons (not selected)
+  &.MuiButton-outlined {
+    color: #64748b !important;
+    border: none !important;
+    background: transparent;
+
+    &:hover {
+      background: #f1f5f9 !important;
+      color: #1e293b !important;
+    }
+  }
+
+  // Styles for contained buttons (selected)
+  &.MuiButton-contained {
+    background: #3b82f6 !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    &:hover {
+      background: #2563eb !important;
+    }
+  }
+}
+
+// --- Responsive Design ---
+@include media-query(md) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid $border-color;
+  }
+
+  .page-buttons-grid {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .page-button {
+    width: auto;
+    flex-grow: 1;
+    justify-content: center !important;
+  }
+
+  .main-screen-body {
+    flex-direction: column;
+  }
+}
+
+@include media-query(sm) {
+  .header-title {
+    font-size: 18px;
+  }
+
+  .header-logo {
+    display: none; // Hide logo on small screens
+  }
+
+  .content-area {
+    padding: $spacing-unit * 2;
+  }
+}
