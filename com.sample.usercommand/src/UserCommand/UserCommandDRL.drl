@@ -12,7 +12,10 @@
 def usercommand_sample_function(waitTime, useOverridePose, initPoseZyx):
     global Global_ip
     global Global_initPoseZyx
-    # tp_popup(message='Connected to ' + Global_ip)
+
+    message='Connected to ' + Global_ip + ', Global_initPoseZyx: ' + str(Global_initPoseZyx)
+    tp_popup(message=message, pm_type=DR_PM_MESSAGE)
+
     wait(waitTime)
     # you can use move() command using posx() without orientation type(zyz, zyx and more)
     # programming manual: https://manual.doosanrobotics.com/en/programming/3.2.1/Publish/posx-x-0-y-0-z-0-a-0-b-0-c-0
@@ -30,4 +33,31 @@ def usercommand_sample_calcXyzToZyz(pos):
     newPos = [pos[0],pos[1],pos[2],newRotation[0],newRotation[1],newRotation[2]]
     tp_popup(message='pose convert from zyx to zyz\nzyx: ' + str(pos) + '\nzyz: '+ str(newPos))
     return newPos
+
+# User Command Sample3 - Start/End Custom Folder
+# These functions demonstrate the Start/End folder structure support in V2
+def usercommand_start_folder(folderName, description=None):
+    """
+    Start a custom folder - marks the beginning of a task group
+    Args:
+        folderName: Name of the folder (required)
+        description: Optional description of the folder
+    """
+    message = 'Starting Folder: ' + folderName
+    if description is not None and description.strip() != '':
+        message = message + '\nDescription: ' + description
+    tp_popup(message=message, pm_type=DR_PM_MESSAGE)
+    # Add any initialization logic for the folder here
+    # e.g., set_digital_output(), move to start position, etc.
+
+def usercommand_end_folder(folderName):
+    """
+    End a custom folder - marks the end of a task group
+    Args:
+        folderName: Name of the folder (must match the start folder)
+    """
+    message = 'Ending Folder: ' + folderName
+    tp_popup(message=message, pm_type=DR_PM_MESSAGE)
+    # Add any cleanup logic for the folder here
+    # e.g., reset outputs, return to home position, etc.
 

@@ -14,11 +14,26 @@ import {
 //UI Setting
 import { ThemeProvider } from '@mui/material/styles';
 import React, { createRef } from 'react';
-import { Box, Divider, Grid } from '@mui/material';
+import { Box, Button, Divider, Grid } from '@mui/material';
 import Database from '../DatabaseManager';
 import TaskPoseControl, { TaskPoseControlAPI } from '../uc/task.pose.control';
 import { EulerType, IMathLibrary } from 'dart-api/dart-api-math';
 import SetGlobalValue from './SetGlobalValue';
+import {
+  CHANNEL_GET_CURRENT_DATA,
+  CHANNEL_DATA_CHANGED,
+  CHANNEL_GET_VARIABLES,
+} from './ChannelConstants';
+import styles from './UserCommandScreen.scss';
+
+interface userCommandState2 {
+  zyxPose: SixNumArray;
+  typeFilter: any[];
+  globalSystemVariable: any[];
+  variableSelected: string;
+  hasError: boolean;
+  errorMessage: string;
+}
 
 /*****
  * Main Life Cycle
@@ -31,6 +46,7 @@ import SetGlobalValue from './SetGlobalValue';
  *
  *****/
 export default class UserCommandScreen2 extends ModuleScreen {
+  private static readonly TAG = 'UserCommandScreen2';
   //Use for data change
   private channel = {} as IModuleChannel;
   private db = {} as Database;
@@ -49,7 +65,9 @@ export default class UserCommandScreen2 extends ModuleScreen {
       typeFilter: [],
       globalSystemVariable: [],
       variableSelected: '',
-    };
+      hasError: false,
+      errorMessage: '',
+    } as userCommandState2;
   }
 
   //Update savedData recieved from Task Editor Module
@@ -57,7 +75,7 @@ export default class UserCommandScreen2 extends ModuleScreen {
     this.taskPoseRef.current?.onChange(this.handleChangePoseCallback);
 
     //[Optional] Update data from the configured database on the main screen in this Module
-    this.db = new Database(this.moduleContext);
+    this.db = Database.getInstance(this.moduleContext);
     const dbData = await this.db.getDataAll();
     if (dbData) {
       this.setState({
@@ -69,13 +87,22 @@ export default class UserCommandScreen2 extends ModuleScreen {
     if (Object.prototype.hasOwnProperty.call(this.message.data, 'savedData')) {
       // const version = this.message.data['savedVersion'];
       const savedData = this.message.data?.savedData;
-      logger.debug(`savedData: ${JSON.stringify(savedData)}`);
+      logger.debug(`[${UserCommandScreen2.TAG}] savedData: ${JSON.stringify(savedData)}`);
 
       if (savedData === null) return;
 
       //update state from savedData in Task Editor Module.
       this.setCurrentData(savedData);
     }
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // Catch errors from child components
+    logger.error(`[${UserCommandScreen2.TAG}] Error caught: ${error.message}, Component Stack: ${errorInfo.componentStack}`);
+    this.setState({
+      hasError: true,
+      errorMessage: error.message,
+    });
   }
 
   handleChangePoseCallback = async (zyxPose: SixNumArray) => {
@@ -96,57 +123,120 @@ export default class UserCommandScreen2 extends ModuleScreen {
       },
       EulerType.ZYZ,
     );
-    logger.debug(`zyx: ${zyxPose} / zyz: ${zyz.pose}`);
+    logger.debug(`[${UserCommandScreen2.TAG}] zyx: ${zyxPose} / zyz: ${zyz.pose}`);
     return zyz.pose;
+  };
+
+  // Check validity: -1 (Error), 0 (Invalid), 1 (Valid)
+  // TODO: Customize this validation logic for your use case
+  getValidity = (data: any): number => {
+    // Check for errors (critical issues that prevent execution)
+    // Check zyxPose validity
+    if (!data.zyxPose) {
+      return -1; // Error: zyxPose not defined
+    }
+
+    // Check if zyxPose is an array with 6 elements
+    if (!Array.isArray(data.zyxPose) || data.zyxPose.length !== 6) {
+      return -1; // Error: zyxPose must be array of 6 numbers
+    }
+
+    // Check if all pose values are valid numbers
+    for (const value of data.zyxPose) {
+      if (typeof value !== 'number' || isNaN(value)) {
+        return -1; // Error: invalid pose value
+      }
+    }
+
+    // Check for invalid states (incomplete but not critical)
+    // Check if variable is selected
+    if (data.variableSelected === '') {
+      return 0; // Invalid: no variable selected
+    }
+
+    // All checks passed
+    return 1; // Valid
   };
 
   //OnBind. When Task Editor save Task, Send saved data.
   onBind(message: Message, channel: IModuleChannel): boolean {
     this.channel = channel;
 
-    // Task Editor Module: Send "get_current_data" message.
-    // User Command Module: Receive "get_current_data" message and send "get_current_data" message with current data.
-    channel.receive('get_current_data', () => {
-      const data: Record<string, any> = this.getCurrentData();
+    // V2: Task Editor Module: Send "get_current_data" message.
+    // User Command Module: Receive "get_current_data" message and send v2 format response
+    channel.receive(CHANNEL_GET_CURRENT_DATA, () => {
+      try {
+        const currentData = this.getCurrentData();
+        const validity = this.getValidity(currentData);
 
-      //Send current data to Task Editor
-      channel.send('get_current_data', data);
+        // V2 response format with validity and summary
+        // summary: Displayed next to command in Task Tree
+        const poseArray = currentData.zyxPose || [0, 0, 0, 0, 0, 0];
+        const poseStr = `[${poseArray.map((v: number) => v.toFixed(1)).join(',')}]`;
+        const response = {
+          data: currentData,
+          validity: validity,
+          summary: currentData.variableSelected !== '' // TODO: Customize this message shown in Task Tree
+            ? `Convert ${poseStr} → ${currentData.variableSelected}`
+            : `Convert ZYX ${poseStr} to ZYZ`
+        };
+
+        logger.debug(`[${UserCommandScreen2.TAG}] get_current_data(response): ${JSON.stringify(response)}`);
+
+        //Send current data to Task Editor with V2 format
+        channel.send(CHANNEL_GET_CURRENT_DATA, response);
+      } catch (error: any) {
+        logger.error(`[${UserCommandScreen2.TAG}] Error in get_current_data: ${error.message}`);
+      }
     });
 
     // Get global variables
-    channel.receive('get_variables', (data) => {
-      logger.debug(`get variables receive : ${JSON.stringify(data)}`);
-      if (data) {
-        this.setState({ globalSystemVariable: data });
+    channel.receive(CHANNEL_GET_VARIABLES, (data) => {
+      try {
+        logger.debug(`[${UserCommandScreen2.TAG}] get_variables(receive) : ${JSON.stringify(data)}`);
+        if (data) {
+          this.setState({ globalSystemVariable: data });
+        }
+      } catch (error: any) {
+        logger.error(`[${UserCommandScreen2.TAG}] Error in get_variables: ${error.message}`);
       }
     });
 
     // Send 'get_variables' request to the task editor module after add receive callback in onBind
     setTimeout(() => {
-      logger.debug('get variables send');
-      this.channel.send('get_variables');
+      logger.debug(`[${UserCommandScreen2.TAG}] get_variables(response)`);
+      this.channel.send(CHANNEL_GET_VARIABLES);
     }, 1000);
-
-    channel.receive('changed_variables', (data) => {
-      logger.debug(
-        `changed_variables request with data: ${JSON.stringify(data)}`,
-      );
-      if (data) {
-        this.setState({ globalSystemVariable: data });
-      }
-    });
 
     return true;
   }
 
   //Send "data_changed" message when the data changed.
   sendDataToTaskEditor = () => {
-    if (this.channel.send !== undefined) {
-      logger.debug('data_changed');
-      const data: Record<string, any> = this.getCurrentData();
+    try {
+      if (this.channel.send !== undefined) {
+        logger.debug(`[${UserCommandScreen2.TAG}] data_changed`);
+        const currentData = this.getCurrentData();
+        const validity = this.getValidity(currentData);
 
-      //Send changed data to Task Editor
-      this.channel.send('data_changed', data);
+        // V2 response format with validity and summary
+        // summary: Displayed next to command in Task Tree
+        const poseArray = currentData.zyxPose || [0, 0, 0, 0, 0, 0];
+        const poseStr = `[${poseArray.map((v: number) => v.toFixed(1)).join(',')}]`;
+        const response = {
+          data: currentData,
+          validity: validity,
+          summary: currentData.variableSelected !== '' // TODO: Customize this message shown in Task Tree
+            ? `Convert ${poseStr} → ${currentData.variableSelected}`
+            : `Convert ZYX ${poseStr} to ZYZ`
+        };
+
+        //Send changed data to Task Editor with V2 format
+        logger.debug(`[${UserCommandScreen2.TAG}] data_changed response: ${JSON.stringify(response)}`);
+        this.channel.send(CHANNEL_DATA_CHANGED, response);
+      }
+    } catch (error: any) {
+      logger.error(`[${UserCommandScreen2.TAG}] Error in sendDataToTaskEditor: ${error.message}`);
     }
   };
 
@@ -156,7 +246,7 @@ export default class UserCommandScreen2 extends ModuleScreen {
     data['variableSelected'] = this.state.variableSelected;
     data['globalSystemVariable'] = this.state.globalSystemVariable;
 
-    logger.debug(`Send current data : ${JSON.stringify(data)}`);
+    logger.debug(`[${UserCommandScreen2.TAG}] Send current data : ${JSON.stringify(data)}`);
     return data;
   };
 
@@ -182,73 +272,45 @@ export default class UserCommandScreen2 extends ModuleScreen {
    * Please make PiP Screen interface in the ThemeProvider. It'll make default design of PiP Screen.
    *****/
   render() {
+    if (this.state.hasError) {
+      return (
+        <ThemeProvider theme={this.systemTheme}>
+          <Box className={styles['error-container']}>
+            <Box className={styles['error-title']}>
+              Error Occurred
+            </Box>
+            <Box className={styles['error-message']}>
+              {this.state.errorMessage}
+            </Box>
+            <Button
+              variant="contained"
+              onClick={() => this.setState({ hasError: false, errorMessage: '' })}
+            >
+              Retry
+            </Button>
+          </Box>
+        </ThemeProvider>
+      );
+    }
+
     return (
       <ThemeProvider theme={this.systemTheme}>
-        <Box
-          sx={{
-            'height': '600px',
-            'marginLeft': '0px',
-            'marginTop': '0px',
-            'minHeight': '100px',
-            'paddingLeft': '20px',
-            'paddingTop': '20px',
-            'width': '484px',
-          }}
-          id="box_101d"
-        >
-          <Box
-            id="typography_3f57"
-            sx={{
-              'fontSize': '20px',
-              'fontWeight': 'bold',
-              'height': '40px',
-              'marginTop': '0px',
-              'paddingTop': '0px',
-            }}
-          >
-            User Command Sample2 Name
+        <Box className={styles['pip-screen-container']}>
+          <Box className={styles['pip-header']}>
+            Convert Pose
           </Box>
-          <Divider
-            id="divider_1839"
-            sx={{
-              'marginBottom': '20px',
-              'marginRight': '20px',
-              'marginTop': '10px',
-            }}
-          ></Divider>
+          <Divider className={styles['pip-divider']}></Divider>
           <Grid
-            sx={{
-              'width': '440px',
-              display: 'flex',
-              alignItems: 'top',
-            }}
             container={true}
-            id="box_323e"
             rowSpacing={1}
             columns={1}
             direction="row"
+            className={styles['pip-grid-container']}
           >
-            <Grid
-              item={true}
-              sx={{
-                'width': '100%',
-                display: 'flex',
-                alignItems: 'center',
-                'zIndex': 2,
-              }}
-            >
+            <Grid item={true} className={styles['pip-grid-item-top']}>
               1. Enter zyx pose.
             </Grid>
-            <Grid
-              item={true}
-              sx={{
-                'width': '100%',
-                'height': '260px',
-                'marginLeft': '-10px',
-                'marginTop': '-10px',
-                'zIndex': 1,
-              }}
-            >
+            <Grid item={true} className={styles['task-pose-container']}>
               <TaskPoseControl
                 pointName={'Point Name'}
                 getPose={'Get Position'}
@@ -258,22 +320,10 @@ export default class UserCommandScreen2 extends ModuleScreen {
                 targetPose={this.state.zyxPose}
               />
             </Grid>
-            <Grid
-              item={true}
-              sx={{
-                'width': '100%',
-                'marginTop': '20px',
-              }}
-            >
+            <Grid item={true} className={`${styles['pip-grid-item-full']} ${styles['pip-grid-item-spacing']}`}>
               2. Select a Global/System Variable to store the converted zyz
             </Grid>
-            <Grid
-              item={true}
-              sx={{
-                'width': '100%',
-                'marginTop': '10px',
-              }}
-            >
+            <Grid item={true} className={`${styles['pip-grid-item-full']} ${styles['pip-grid-item-spacing-small']}`}>
               <SetGlobalValue
                 visible={true}
                 // bool: 0, int: 1, flaot: 2, string: 3, posj: 4, posx: 5, list: 6, unknonwn: 7

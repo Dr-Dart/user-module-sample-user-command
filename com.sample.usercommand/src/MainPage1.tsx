@@ -4,12 +4,16 @@
 */
 import { ModuleContext } from 'dart-api';
 import React, { useState, useEffect } from 'react';
-import { Box, TextField } from '@mui/material';
+import { Box, TextField, Paper, Typography, InputAdornment } from '@mui/material';
+import SettingsInputAntennaIcon from '@mui/icons-material/SettingsInputAntenna';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Database, {
   IDBData,
   InitialDBData,
   TABLE_COLUMN_IP,
 } from './DatabaseManager';
+import styles from './MainPage1.scss';
+
 interface IMainPage1 {
   moduleContext: ModuleContext;
 }
@@ -17,76 +21,65 @@ interface IMainPage1 {
 export default function MainPage1(props: IMainPage1) {
   const [deviceIp, SetDeviceIp] = useState('');
 
-  const db = new Database(props.moduleContext);
+  const db = Database.getInstance(props.moduleContext);
 
   useEffect(() => {
-    // ComponentDidMount timing
     const isInit = async () => {
-      // Get Ip from database
-      await db.initialize();
       let data = await db.getDataAll();
       if (data === null) data = InitialDBData;
-
-      // Update state for changing IP in TextField UI Component
       SetDeviceIp(data.ip);
     };
     isInit();
-
-    // ComponentWillUnmount timing
-    // return () => {};
   }, []);
 
   return (
-    <Box
-      sx={{
-        'height': '40px',
-        'marginLeft': '20px',
-        'marginTop': '20px',
-      }}
-      id="box_18c8"
-    >
-      <Box
-        sx={{
-          alignItems: 'left',
-          display: 'flex',
-          'height': '60px',
-          'width': '460px',
-        }}
-        id="box_323e"
-      >
-        <Box
-          sx={{
-            'fontFamily': 'Noto Sans',
-            'fontWeight': 'bold',
-            'height': '40px',
-            'width': '250px',
-          }}
-        >
-          1.Set your device IP
-        </Box>
-        <TextField
-          id="textfield_de61"
-          sx={{
-            '& .MuiFormLabel-root': {
-              'fontSize': '16px',
-            },
-          }}
-          value={deviceIp}
-          //6. Change the state value when the onChange Event occurs in TextField.
-          onChange={(event) => {
-            SetDeviceIp(event.target.value);
-          }}
-          // 7. When the onBlur (out of focus) Event occurs in the TextField, the value is saved in the DB.
-          // Call a function when a user leaves an input field  https://www.w3schools.com/jsref/event_onblur.asp#
-          onBlur={async (event) => {
-            const data = {
-              ip: event.target.value,
-            } as IDBData;
-            await db.saveData(TABLE_COLUMN_IP, data.ip);
-          }}
-          placeholder={'Device IP'}
-        />
+    <Paper elevation={0} className={styles['content-card']}>
+      <Box className={styles['card-header']}>
+        <SettingsInputAntennaIcon className={styles['card-header-icon']} />
+        <Typography variant="h5" component="h2" className={styles['card-title']}>
+          Device IP Setting
+        </Typography>
       </Box>
-    </Box>
+      <Typography variant="body2" className={styles['card-subtitle']}>
+        Configure the IP address of your device to establish connection
+      </Typography>
+      <Box className={styles['input-container']}>
+        <Box className={styles['input-row']}>
+          <Typography className={styles['input-label']} component="label">
+            Device IP Address
+          </Typography>
+          <TextField
+            id="textfield_de61"
+            variant="outlined"
+            size="medium"
+            fullWidth
+            value={deviceIp}
+            onChange={(event) => {
+              SetDeviceIp(event.target.value);
+            }}
+            onBlur={async (event) => {
+              const data = {
+                ip: event.target.value,
+              } as IDBData;
+              await db.saveData(TABLE_COLUMN_IP, data.ip);
+            }}
+            placeholder="e.g., 192.168.1.100"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SettingsInputAntennaIcon color="action" />
+                </InputAdornment>
+              ),
+              endAdornment: deviceIp && (
+                <InputAdornment position="end">
+                  <CheckCircleIcon className={styles['success-icon']} />
+                </InputAdornment>
+              ),
+            }}
+            className={styles['fancy-textfield']}
+          />
+        </Box>
+      </Box>
+    </Paper>
   );
 }

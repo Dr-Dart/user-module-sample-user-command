@@ -6,7 +6,7 @@
   "type": "USER_COMMAND",
   "screens": [
     {
-      "name": "User Command Sample",
+      "name": "User Command Sample V2",
       "id": "MainScreen",
       "messageFilters": [
         {
@@ -20,7 +20,7 @@
       "id": "usercommand_id1",
       "messageFilters": [
         {
-          "action": "com.dart.module.taskeditor.action.USER_COMMAND",
+          "action": "com.dart.module.taskeditor.action.USER_COMMAND_V2",
           "category": "dart.message.category.PIP_SCREEN"
         }
       ]
@@ -30,7 +30,22 @@
       "id": "usercommand_id2",
       "messageFilters": [
         {
-          "action": "com.dart.module.taskeditor.action.USER_COMMAND",
+          "action": "com.dart.module.taskeditor.action.USER_COMMAND_V2",
+          "category": "dart.message.category.PIP_SCREEN"
+        }
+      ]
+    },
+    {
+      "name": "Custom Folder",
+      "id": "usercommand_folder",
+      "data": {
+        "endCommand": {
+          "name": "End Custom Folder"
+        }
+      },
+      "messageFilters": [
+        {
+          "action": "com.dart.module.taskeditor.action.USER_COMMAND_V2",
           "category": "dart.message.category.PIP_SCREEN"
         }
       ]
@@ -42,7 +57,7 @@
       "id": "usercommand_id1",
       "messageFilters": [
         {
-          "action": "com.dart.module.taskeditor.action.USER_COMMAND",
+          "action": "com.dart.module.taskeditor.action.USER_COMMAND_V2",
           "category": "dart.message.category.SERVICE"
         }
       ]
@@ -52,7 +67,17 @@
       "id": "usercommand_id2",
       "messageFilters": [
         {
-          "action": "com.dart.module.taskeditor.action.USER_COMMAND",
+          "action": "com.dart.module.taskeditor.action.USER_COMMAND_V2",
+          "category": "dart.message.category.SERVICE"
+        }
+      ]
+    },
+    {
+      "name": "usercommand_folder service",
+      "id": "usercommand_folder",
+      "messageFilters": [
+        {
+          "action": "com.dart.module.taskeditor.action.USER_COMMAND_V2",
           "category": "dart.message.category.SERVICE"
         }
       ]
